@@ -2,21 +2,22 @@
 <form action="/films" method="GET">
     <div>
         <label >Title</label>
-        <input type="text" name="title" value="<%= searchOption.title %> ">
+        <input type="text" name="title" value="<%=searchOption.title%>">
     </div>
     <div>
         <label >Published After</label>
-        <input type="date" name="publishedAfter" value="<%= searchOption.publishedAfter %> ">
+        <input type="date" name="publishedAfter" value="<%=searchOption.publishedAfter%>">
     </div>
     <div>
         <label >Published Before</label>
-        <input type="date" name="publishedBefore" value="<%= searchOption.publishedBefore %> ">
+        <input type="date" name="publishedBefore" value="<%=searchOption.publishedBefore%>">
     </div>
     <button type="submit">Search</button>
+    <button type="reset" onclick="location.href='/films'">Clear</button>
 </form>
 <div>
-    <% films.forEach(film => { %>
-        <div><%= film.title %></div>
-        <img height="150" width="100" src="<%= film.coverImagePath %> ">
-    <% }) %>
+    <%films.forEach(film => { %>
+        <div><%=film.title%></div>
+        <img height="150" width="100" src="<%=film.coverImagePath%> ">
+    <% })%>
 </div>
