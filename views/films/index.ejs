@@ -17,7 +17,9 @@
 </form>
 <div>
     <%films.forEach(film => { %>
-        <div><%=film.title%></div>
-        <img height="150" width="100" src="<%=film.coverImagePath%> ">
+        <a href="/films/<%= film.id %> ">        
+            <div><%=film.title%></div>
+            <img height="150" width="100" src="<%=film.coverImagePath%> ">
+        </a>
     <% })%>
 </div>

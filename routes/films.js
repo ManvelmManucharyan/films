@@ -41,21 +41,94 @@ router.post('/', async (req, res)=>{
     saveCover(films, req.body.cover);
     try {
         const newFilm = await films.save();
-        res.redirect(`films`);
+        res.redirect(`films/${films.id}`);
     } catch {
         renderNewPage(res, films, true);
     }
 });
 
+router.get('/:id', async (req,res)=>{
+    try {
+        const film = await Films.findById(req.params.id).populate('director').exec();
+        res.render('films/show', {film});
+    } catch {
+        res.redirect('/');
+    }
+});
+
+router.get('/:id/edit', async (req, res)=>{
+    try{
+        const film = await Films.findById(req.params.id);
+        renderEditPage(res, film);
+    } catch {
+        res.redirect('/');
+    }
+});
+
+router.put('/:id', async (req, res)=>{
+    let film;
+    try {
+        film = await Films.findById(req.params.id);
+        film.title= req.body.title;
+        film.director= req.body.director;
+        film.publishDate= new Date(req.body.publishDate);
+        film.duration= req.body.duration;
+        film.description= req.body.description;
+        if(req.body.cover != null && req.body.cover != ''){
+            saveCover(film, req.body.cover);
+        }
+        await film.save();
+        res.redirect(`/films/${film.id}`);
+    } catch (err) {
+        if(film != null){
+            renderEditPage(res, film, true);
+        }
+        res.redirect('/');
+    }
+});
+
+router.delete('/:id', async (req, res)=>{
+    let films;
+    try{
+        films = await Films.findById(req.params.id);
+        await films.remove();
+        res.redirect('/films');
+    } catch{
+        if(films != null){
+            res.render('films/show', {
+                films,
+                errorMessage: "Couldn't Remove Film"
+            });
+        } else {
+            res.redirect('/');
+        }
+    }
+});
+
+
 async function renderNewPage (res, films, hasError = false){
+    renderFormPage(res, films, 'new', hasError);
+}
+
+async function renderEditPage (res, films, hasError = false){
+    renderFormPage(res, films, 'edit', hasError);
+}
+
+async function renderFormPage (res, films, form, hasError = false){
     try{
         const directors = await Directors.find({});
         const params =  {
             directors,
             films,
         };
-        if(hasError) {params.errorMessage = 'Error Creating Film';}
-        res.render('films/new', params);
+        if(hasError) {
+            if(from === 'edit'){
+                params.errorMessage = 'Error Updating Film';
+            } else if(form === 'new'){
+                params.errorMessage = 'Error Creating Film';
+            }
+        }
+        res.render(`films/${form}`, params);
     } catch{
         res.redirect('/films');
     }
